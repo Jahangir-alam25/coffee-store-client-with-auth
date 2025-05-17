@@ -14,13 +14,21 @@ const SignUp = () => {
         event.preventDefault();
         const form = event.target;
         const formData = new FormData(form);
-        const { email, password, ...userProfile } = Object.fromEntries(formData.entries());
+        const { email, password, ...restFormData } = Object.fromEntries(formData.entries());
+
+
 
         createUser(email, password)
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
                 console.log(user);
+                const userProfile = {
+                    email,
+                    ...restFormData,
+                    creationTime : user.metadata.creationTime,
+                    lastSignInTime: user.metadata.lastSignInTime,
+                }
 
                 fetch('http://localhost:3000/users', {
                     method: 'POST',
@@ -31,7 +39,7 @@ const SignUp = () => {
                 }).then(res => res.json())
                     .then(data => {
                         if (data.insertedId) {
-             
+
                             Swal.fire({
                                 position: "top-end",
                                 icon: "success",
